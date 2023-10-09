@@ -4,6 +4,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time ,asyncio
 from  article_model import Article
+import csv
 
 URL = "http://e-pao.net/"
 
@@ -43,11 +44,17 @@ async def sel():
          "link":anchor.get_attribute("href").strip()
       }
    for anchor in anchor_list]
-     
-   for link in links:
-     articleObj = await extractDetail(link=link.get("link"))
-     print(f"Headline {articleObj.heading}")
-     print(f"Body {articleObj.article}")
+   with open('articles.csv', mode='a', newline='', encoding='utf-8') as csv_file:
+    # Define the CSV writer
+    csv_writer = csv.DictWriter(csv_file, fieldnames=['heading', 'article'])
+    
+    # Write the header row
+    csv_writer.writeheader()
+    for link in links:
+      articleObj = await extractDetail(link=link.get("link"))
+      print(f"Headline {articleObj.heading}")
+      print(f"Body {articleObj.article}")
+      csv_writer.writerow({'heading': articleObj.heading, 'article': articleObj.article})
 
    driver.quit()
 
